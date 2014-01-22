@@ -12,23 +12,34 @@
      default: "y"
      private: false
   tasks:
+   - name: install epel
+      action: command creates=/etc/yum.repos.d/epel.repo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
     - name: make sure packages are installed
-      action: apt pkg={{ item }} state=installed
+      action: yum pkg=$item state=installed
       with_items:
+        - htop
         - rubygems
         - python-virtualenv
         - python-setuptools
-        - git-core
-        - python-dev
-        - ruby1.8-dev
+        - git
+        - python-devel
+        - ruby-devel
         - postgresql
-        - libpq-dev
-        - libxml2-dev
-        - libxslt1-dev
-        - build-essential
-        - apache2
-        - libapache2-mod-wsgi
-        - nginx
+        - postgresql-libs
+        - postgresql-devel
+        - libxml2-devel
+        - libxslt-devel
+        - httpd
+        - rpmdevtools
+        - gcc
+        - gcc-c++
+        - make
+        - bison
+        - createrepo
+        - mod_wsgi
+        - tomcat6
+        - cronie
+        - libselinux-python
 
     - name: install fpm
       action: command gem install -v 0.4.21 fpm creates=/usr/local/bin/fpm
@@ -44,13 +55,9 @@
 
     - name: get pip
       action: easy_install name=pip
-
-    - name: check requirements file name
-      shell: "[ -f /usr/lib/ckan/default/src/ckan/pip-requirements.txt ] && echo 'pip-requirements.txt' || echo 'requirements.txt'"
-      register: requirements_file_name
-
-    - name: install requirements and make virtualenv for ckan
-      action: pip requirements=/usr/lib/ckan/default/src/ckan/{{ requirements_file_name.stdout }} virtualenv=/usr/lib/ckan/default/ virtualenv_site_packages=no
+   
+   - name: install requirements and make virtualenv
+      action: pip requirements=/usr/lib/ckan/default/src/ckan/pip-requirements.txt virtualenv=/usr/lib/ckan/default/ virtualenv_site_packages=yes
 
     - name: run setup.py develop for ckan
       action: command chdir=/usr/lib/ckan/default/src/ckan/ ../../bin/python setup.py develop
