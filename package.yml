@@ -14,7 +14,7 @@
   tasks:
    - name: install epel
       action: command creates=/etc/yum.repos.d/epel.repo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-    - name: make sure packages are installed
+   - name: make sure packages are installed
       action: yum pkg=$item state=installed
       with_items:
         - htop
@@ -56,7 +56,7 @@
     - name: get pip
       action: easy_install name=pip
    
-   - name: install requirements and make virtualenv
+    - name: install requirements and make virtualenv
       action: pip requirements=/usr/lib/ckan/default/src/ckan/pip-requirements.txt virtualenv=/usr/lib/ckan/default/ virtualenv_site_packages=yes
 
     - name: run setup.py develop for ckan
