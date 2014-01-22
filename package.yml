@@ -64,7 +64,7 @@
 
       # if datapusher needs to be setup
     - name: install ckanserviceprovider and make virtualenv for datapusher
-      action: pip virtualenv=/usr/lib/ckan/datapusher/ virtualenv_site_packages=no name='git+https://github.com/okfn/ckan-service-provider#egg=ckanserviceprovider'
+      action: pip virtualenv=/usr/lib/ckan/datapusher/ virtualenv_site_packages=yes name='git+https://github.com/okfn/ckan-service-provider#egg=ckanserviceprovider'
       when: datapusher == 'y'
 
     - name: pull datapusher
@@ -79,37 +79,35 @@
       action: file path={{ item }} state=directory
       with_items:
         - /etc/ckan/default
-        - /var/www/build
-
+        - /var/www/ckan-repo/master
+        
+    - name: default apache removed
+      action: file path=/etc/httpd/conf.d/welcome.conf state=absent
+    
     - name: copy all needed files
       action: copy src={{ item }} dest=/{{ item }}
       with_items:
         - etc/ckan/default/who.ini
         - etc/ckan/default/apache.wsgi
-        - etc/apache2/sites-available/ckan_default
-        - etc/nginx/sites-available/ckan
+        - etc/ckan/production.ini
+        - etc/supervisord.conf
+        - etc/httpd/conf.d/ckan.conf
+        - etc/httpd/conf.d/ckan-repo.conf
         - etc/cron.daily/remove_old_sessions
 
     - name: copy executables
       action: copy src={{ item }} dest=/{{ item }} mode=744
       with_items:
         - usr/bin/ckan
+        - tmp/after_web.sh
+        
+    - name: restart apache
+      action: service name=httpd state=restarted
 
-    - name: template the after web script
-      action: template src=tmp/after_web.j2 dest=/tmp/after_web.sh mode=744
+    - name: build rpm main 
+      action: command chdir=/var/www/ckan-repo/master/ fpm -t rpm -s dir --description='datastore.data.gov web frontend' --after-install=/tmp/after_web.sh -n datastore.data.gov.web --iteration $iteration -v $version -d memcached -d postgresql -d httpd -d mod_wsgi -d geos -d cronie -d python-psycopg2 -d xmlsec1 -d xmlsec1-openssl -d swig -d m2crypto --config-files /etc/ckan/who.ini --config-files /etc/ckan/production.ini --config-files /etc/httpd/conf.d/ckan.conf /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/httpd/conf.d/ckan.conf /etc/cron.daily/remove_old_sessions
+   
+    - name: create repo
+      action: command createrepo /var/www/ckan-repo/master/
+  
 
-    - name: build deb main
-      action: command chdir=/var/www/build fpm
-              -t deb -s dir
-              --name python-ckan
-              --description='CKAN is an open-source DMS (data management system) for powering data hubs and data portals.'
-              --license='AGPL v3.0'
-              --maintainer='CKAN team <ckan-dev@lists.okfn.org>'
-              --vendor='Open Knowledge Foundation'
-              --url='http://ckan.org'
-              --after-install=/tmp/after_web.sh
-              --iteration {{ iteration }}
-              --version {{ version }}
-              --depends nginx --depends apache2 --depends libapache2-mod-wsgi --depends libpq5
-              --config-files /etc/apache2/sites-available/ckan_default --config-files /etc/nginx/sites-available/ckan
-              /usr/lib/ckan/ /etc/ckan/ /usr/bin/ckan /etc/cron.daily/remove_old_sessions /etc/apache2/sites-available/ckan_default /etc/nginx/sites-available/ckan
