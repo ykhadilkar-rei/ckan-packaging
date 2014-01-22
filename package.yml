@@ -13,33 +13,33 @@
      private: false
   tasks:
    - name: install epel
-      action: command creates=/etc/yum.repos.d/epel.repo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+     action: command creates=/etc/yum.repos.d/epel.repo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
    - name: make sure packages are installed
-      action: yum pkg=$item state=installed
-      with_items:
-        - htop
-        - rubygems
-        - python-virtualenv
-        - python-setuptools
-        - git
-        - python-devel
-        - ruby-devel
-        - postgresql
-        - postgresql-libs
-        - postgresql-devel
-        - libxml2-devel
-        - libxslt-devel
-        - httpd
-        - rpmdevtools
-        - gcc
-        - gcc-c++
-        - make
-        - bison
-        - createrepo
-        - mod_wsgi
-        - tomcat6
-        - cronie
-        - libselinux-python
+     action: yum pkg=$item state=installed
+     with_items:
+       - htop
+       - rubygems
+       - python-virtualenv
+       - python-setuptools
+       - git
+       - python-devel
+       - ruby-devel
+       - postgresql
+       - postgresql-libs
+       - postgresql-devel
+       - libxml2-devel
+       - libxslt-devel
+       - httpd
+       - rpmdevtools
+       - gcc
+       - gcc-c++
+       - make
+       - bison
+       - createrepo
+       - mod_wsgi
+       - tomcat6
+       - cronie
+       - libselinux-python
 
     - name: install fpm
       action: command gem install -v 0.4.21 fpm creates=/usr/local/bin/fpm
