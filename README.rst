@@ -1,3 +1,6 @@
+THIS IS MODIFIED VERSION OF ORIGINAL DEB SCRIPT ... TO CREATE CENTOS RPM
+
+
 CKAN Packaging Scripts
 ======================
 
