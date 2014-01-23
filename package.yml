@@ -91,7 +91,6 @@
      with_items:
        - etc/ckan/default/who.ini
        - etc/ckan/default/apache.wsgi
-       - etc/ckan/production.ini
        - etc/supervisord.conf
        - etc/httpd/conf.d/ckan.conf
        - etc/httpd/conf.d/ckan-repo.conf
