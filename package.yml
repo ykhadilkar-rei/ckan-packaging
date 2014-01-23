@@ -1,5 +1,7 @@
 ---
-- hosts: build
+- hosts: default
+  user: vagrant
+  sudo: True
   vars_prompt:
    - name: version
      prompt: "Ckan Version"
