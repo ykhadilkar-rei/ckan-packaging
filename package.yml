@@ -90,8 +90,7 @@
      action: copy src={{ item }} dest=/{{ item }}
      with_items:
        - etc/ckan/default/who.ini
-       - etc/ckan/default/apache.wsgi
-       - etc/supervisord.conf
+       - etc/ckan/default/apache.wsgi  
        - etc/httpd/conf.d/ckan.conf
        - etc/httpd/conf.d/ckan-repo.conf
        - etc/cron.daily/remove_old_sessions
@@ -106,7 +105,14 @@
      action: service name=httpd state=restarted
 
    - name: build rpm main 
-     action: command chdir=/var/www/ckan-repo/master/ fpm -t rpm -s dir --description='datastore.data.gov web frontend' --after-install=/tmp/after_web.sh -n datastore.data.gov.web --iteration $iteration -v $version -d memcached -d postgresql -d httpd -d mod_wsgi -d geos -d cronie -d python-psycopg2 -d xmlsec1 -d xmlsec1-openssl -d swig -d m2crypto --config-files /etc/ckan/who.ini --config-files /etc/ckan/production.ini --config-files /etc/httpd/conf.d/ckan.conf /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/httpd/conf.d/ckan.conf /etc/cron.daily/remove_old_sessions
+     action: command chdir=/var/www/ckan-repo/master/ fpm 
+             -t rpm -s dir 
+             --description='datastore.data.gov web frontend' 
+             --after-install=/tmp/after_web.sh -n datastore.data.gov.web 
+             --iteration $iteration 
+             --version $version 
+             -d memcached -d postgresql -d httpd -d mod_wsgi -d geos -d cronie -d python-psycopg2 -d xmlsec1 -d xmlsec1-openssl -d swig -d m2crypto 
+             --config-files /etc/ckan/default/who.ini --config-files /etc/ckan/  --config-files /etc/httpd/conf.d/ckan.conf /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/httpd/conf.d/ckan.conf /etc/cron.daily/remove_old_sessions
    
    - name: create repo
      action: command createrepo /var/www/ckan-repo/master/
