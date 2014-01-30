@@ -74,7 +74,7 @@
      when: datapusher == 'y'
 
    - name: run setup.py develop for datapusher
-     action: command chdir=/usr/lib/ckan/datapusher/src/datapusher/ ../../bin/python setup.py develop
+     action: command chdir=/usr/lib/ckan/datapusher/src/datapusher/ /usr/lib/ckan/dafault/bin/python setup.py develop
      when: datapusher == 'y'
 
    - name: create directories
