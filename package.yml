@@ -46,23 +46,23 @@
    - name: install fpm
      action: command gem install -v 0.4.21 fpm creates=/usr/local/bin/fpm
 
-   - name: delete old directories
-     action: file path={{ item }} state=absent
-     with_items:
-       - /etc/ckan
-       - /usr/lib/ckan
-
+   - name: remove old code
+     action: file path=/usr/lib/ckan state=absent
+     
    - name: pull ckan version
      action: git repo=https://github.com/okfn/ckan dest=/usr/lib/ckan/default/src/ckan version=release-v{{ version }}
 
    - name: get pip
-     action: easy_install name=pip
+     action: easy_install name=https://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz
    
    - name: install requirements and make virtualenv
      action: pip requirements=/usr/lib/ckan/default/src/ckan/requirements.txt virtualenv=/usr/lib/ckan/default/ virtualenv_site_packages=yes
 
    - name: run setup.py develop for ckan
      action: command chdir=/usr/lib/ckan/default/src/ckan/ ../../bin/python setup.py develop
+   
+   - name: make sure pip is 1.3.1
+     action: command chdir=/usr/lib/ckan/default/src/ckan/ ../../bin/easy_install https://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz   
 
       # if datapusher needs to be setup
    #- name: install ckanserviceprovider and make virtualenv for datapusher
@@ -112,8 +112,8 @@
              --iteration $iteration 
              --version $version 
              -d memcached -d postgresql -d httpd -d mod_wsgi -d geos -d cronie -d python-psycopg2 -d xmlsec1 -d xmlsec1-openssl -d swig -d m2crypto 
-             --config-files /etc/ckan/default/who.ini --config-files /etc/ckan/  --config-files /etc/httpd/conf.d/ckan.conf /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/httpd/conf.d/ckan.conf /etc/cron.daily/remove_old_sessions
-   
+             --config-files /etc/ckan/default/who.ini --config-files /etc/ckan/default/development.ini --config-files /etc/httpd/conf.d/ckan.conf /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/httpd/conf.d/ckan.conf /etc/cron.daily/remove_old_sessions
+
    - name: create repo
      action: command createrepo /var/www/ckan-repo/master/
   
